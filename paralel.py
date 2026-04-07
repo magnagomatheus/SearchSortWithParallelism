@@ -39,12 +39,10 @@ def findNumberSeq(vector, x:int):
 def main():
 
     # Creating the vector with 50000 numbers
-    vector = np.random.randint(0, high=49999, size=50000)
+    #vector = np.random.randint(0, high=49999, size=50000)
+    vector = np.random.permutation(50000)
     x = 10000
-    # Testing serial time to find the number within the vector
-    start = time.time()
-    result = findNumberSeq(vector, x)
-    end = time.time()
+    #x = np.array([x_original], dtype=vector.dtype)[0]
 
     ######################### SHARED MEMORY CODE ############################
 
@@ -67,19 +65,24 @@ def main():
 
     ######################### SHARED MEMORY CODE ############################
 
+    ######################### SERIAL CODE TEST ############################
 
-    ######################### Child Process CODE ############################
+    # Testing serial time to find the number within the vector
+    start = time.time()
+    resultSequencial = findNumberSeq(shared_vector, x)
+    end = time.time()
 
-    # Creating a child process and telling him to use the shared memory space
+    ######################### SERIAL CODE TEST ############################
 
-    ######################## PROCESS 1 #######################################
+
+    ######################## PROCESSES #######################################
 
     tasks = []
     qtdNucleos = os.cpu_count()
     print(f"Quantidade de nucleos: {qtdNucleos}\n")
         
     # Indica a div de trabalho na lista
-    divisaoIndices = vector.size // qtdNucleos-1
+    divisaoIndices = vector.size // qtdNucleos
     
     
     for i in range(qtdNucleos):
@@ -125,7 +128,7 @@ def main():
     """
 
 
-    ######################## PROCESS 1 #######################################
+    ######################## PROCESS #######################################
 
     # Free the memory space allocated for shared memory
     shm.close() # Detach the parent from the shared memory
@@ -133,18 +136,13 @@ def main():
 
     print(f"Search with parallelism time was: {end2 - start2}")
 
-    ######################### Child Process CODE ############################
-
-    # Printing the vector to see if the vector could be created
-    #print(vector)
-    #print(vector.size)
 
     print()
     #Printing the result of the search
-    if(result == None):
+    if(resultSequencial == None):
         print(f"Number not found!")
     else:
-        print(f"{x} was found on the {result}st position")
+        print(f"{x} was found on the {resultSequencial}st position")
     print(f"Tempo decorrido: {end-start}")
 
     return 0
